@@ -97,7 +97,7 @@ The LLM picks tools automatically based on your conversation. The extension rout
 | Sync | Multi-device | None (use cloud for sync) |
 | Offline | No | Yes |
 | Setup | API key | `pip install memra-local && memra-local serve` |
-| Price | Free tier + paid plans | Free, BUSL-1.1 |
+| Price | Free tier + paid plans | Free, BUSL-1.1 (memra-local) |
 
 Get a cloud key: **[usememra.com/install](https://usememra.com/install)**
 
@@ -115,4 +115,4 @@ Then run `pi` and `/reload`.
 
 ## License
 
-BUSL-1.1 → Apache-2.0 on 2030-04-17. Non-production use is free. Commercial use beyond non-production requires a license from the author.
+MIT. Use it anywhere. The Memra backend (usememra.com) and memra-local server have their own licenses.
