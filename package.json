@@ -1,0 +1,47 @@
+{
+  "name": "@usememra/pi-extension",
+  "version": "0.3.1",
+  "description": "Persistent memory for pi coding agent. Hybrid cloud + local backend (Memra).",
+  "license": "BUSL-1.1",
+  "author": "Ali Vonsensey",
+  "homepage": "https://usememra.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/usememra/pi-extension.git"
+  },
+  "keywords": [
+    "pi",
+    "pi-mono",
+    "memra",
+    "memory",
+    "llm",
+    "agent",
+    "coding-agent",
+    "extension",
+    "pi-package"
+  ],
+  "pi": {
+    "extensions": [
+      "./src/index.ts"
+    ]
+  },
+  "files": [
+    "src",
+    "README.md",
+    "USER-INSTALL.md",
+    "PRODUCTION-READY.md",
+    "AUDIT.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "tsconfig.json",
+    "package.json"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "peerDependencies": {
+    "@mariozechner/pi-ai": "*",
+    "@mariozechner/pi-coding-agent": "*",
+    "@sinclair/typebox": "*"
+  }
+}
