@@ -7,7 +7,7 @@
   "homepage": "https://usememra.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/usememra/pi-extension.git"
+    "url": "git+https://github.com/usememra/pi-extension.git"
   },
   "keywords": [
     "pi",
