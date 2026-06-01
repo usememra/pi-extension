@@ -96,7 +96,7 @@ The LLM picks tools automatically based on your conversation. The extension rout
 | Storage | Managed (EU, Hetzner Helsinki) | Your machine |
 | Sync | Multi-device | None (use cloud for sync) |
 | Offline | No | Yes |
-| Setup | API key | `pip install memra-local && memra-local serve` |
+| Setup | API key | `pip install memra-local && memra serve` |
 | Price | Free tier + paid plans | Free, BUSL-1.1 (memra-local) |
 
 Get a cloud key: **[usememra.com/install](https://usememra.com/install)**

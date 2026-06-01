@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.3
+
+- Fix README: the local server command is `memra serve`, not `memra-local serve` (the console script is `memra`; there is no `memra-local` binary)
+- Note that memra-local's local embeddings now use fastembed/ONNX (no PyTorch) — no extension changes; the REST API it consumes is unchanged
+
 ## 0.3.0
 
 - Add `memra_recall` + `memra_remember` as primary tools (match Memra SaaS v4.3 canonical verb names)
