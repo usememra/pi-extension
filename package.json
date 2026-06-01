@@ -1,6 +1,6 @@
 {
   "name": "@usememra/pi-extension",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Persistent memory for pi coding agent. Hybrid cloud + local backend (Memra).",
   "license": "MIT",
   "author": "Ali Vonsensey",
@@ -40,8 +40,8 @@
     "node": ">=20"
   },
   "peerDependencies": {
-    "@mariozechner/pi-ai": "*",
-    "@mariozechner/pi-coding-agent": "*",
-    "@sinclair/typebox": "*"
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-coding-agent": "*",
+    "typebox": "*"
   }
 }

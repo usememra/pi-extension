@@ -1,5 +1,5 @@
-import { Type } from "@sinclair/typebox";
-import { StringEnum } from "@mariozechner/pi-ai";
+import { Type } from "typebox";
+import { StringEnum } from "@earendil-works/pi-ai";
 import type { Backend, RecallResult } from "./backend.ts";
 import type { MemraConfig } from "./config.ts";
 import {
@@ -7,7 +7,7 @@ import {
   DEFAULT_MAX_BYTES,
   DEFAULT_MAX_LINES,
   formatSize,
-} from "@mariozechner/pi-coding-agent";
+} from "@earendil-works/pi-coding-agent";
 import { writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
