@@ -325,6 +325,29 @@ export function createBackend(cfg: MemraConfig): Backend {
   return createLocalBackend(cfg.local!);
 }
 
+/**
+ * Best-effort lookup of a cloud project's human-readable name from its id.
+ * Returns undefined on any failure (no key/id, network, 404) — callers fall
+ * back to showing the raw project id, so this must never throw.
+ */
+export async function fetchProjectName(
+  cfg: NonNullable<MemraConfig["cloud"]>,
+): Promise<string | undefined> {
+  if (!cfg.apiKey || !cfg.projectId) return undefined;
+  try {
+    const base = normalizeCloudBaseUrl(cfg.apiUrl || DEFAULT_CLOUD_BASE_URL);
+    const v1 = base.endsWith("/api") ? `${base}/v1` : `${base}/api/v1`;
+    const res = await request<{ name?: string }>(
+      `${v1}/projects/${encodeURIComponent(cfg.projectId)}`,
+      { headers: cloudHeaders(cfg.apiKey), timeoutMs: 5000 },
+    );
+    const name = res?.name?.trim();
+    return name || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export async function autoDetect(cfg: MemraConfig): Promise<BackendMode | null> {
   if (cfg.cloud?.apiKey) return "cloud";
   try {

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.4
+
+- Status badge now shows the cloud **project name** instead of the raw project id, resolved best-effort from `GET /v1/projects/{id}` on session start and cached in config (`fetchProjectName` + `renderBadge`)
+- Removed an unused/duplicate entry-point draft (`src/memra.ts`); folded its project-name feature into the canonical `index.ts` while keeping the `memra_recall` tool name and the config guard
+
 ## 0.3.3
 
 - Fix README: the local server command is `memra serve`, not `memra-local serve` (the console script is `memra`; there is no `memra-local` binary)

@@ -12,6 +12,9 @@ export interface MemraConfig {
     apiKey?: string;
     projectId: string;
     tenantId: string;
+    // Human-readable project name, resolved best-effort from the API and cached
+    // here so the status badge can show a friendly name instead of the raw id.
+    projectName?: string;
   };
   local?: {
     url: string;

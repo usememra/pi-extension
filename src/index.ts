@@ -1,8 +1,8 @@
 import { loadConfig, saveConfig, type MemraConfig } from "./config.ts";
-import { createBackend, type Backend } from "./backend.ts";
+import { createBackend, fetchProjectName, type Backend } from "./backend.ts";
 import { buildTools } from "./tools.ts";
 import { runCommand, initialConfigure, helpText, type State } from "./commands.ts";
-import { BADGE_KEY, INSTALL_URL, welcomeMessage } from "./ui.ts";
+import { BADGE_KEY, INSTALL_URL, renderBadge, welcomeMessage } from "./ui.ts";
 
 // Structural types — we bind to the pi ExtensionAPI surface by shape
 // so the extension stays resilient across minor pi versions.
@@ -79,6 +79,22 @@ function memraExtensionUnsafe(pi: ExtensionAPI) {
       state.config = await loadConfig();
       await state.rebuild();
 
+      // Resolve the cloud project name if missing (best-effort, don't block)
+      // so the badge can show a friendly name instead of the raw project id.
+      if (
+        state.config.mode === "cloud" &&
+        state.config.cloud?.apiKey &&
+        state.config.cloud?.projectId &&
+        !state.config.cloud.projectName
+      ) {
+        void fetchProjectName(state.config.cloud).then((name) => {
+          if (name && state.config.cloud) {
+            state.config.cloud.projectName = name;
+            void saveConfig(state.config);
+          }
+        });
+      }
+
       // Auto-detect and configure if needed
       const cloudMissingKey =
         state.config.mode === "cloud" && !state.config.cloud?.apiKey && !process.env.MEMRA_API_KEY;
@@ -92,9 +108,7 @@ function memraExtensionUnsafe(pi: ExtensionAPI) {
       // Update badge
       const finalHealth = state.backend ? await state.backend.health() : { ok: false };
       const badge = state.backend
-        ? finalHealth.ok
-          ? state.backend.label
-          : `${state.backend.label} · DOWN`
+        ? renderBadge(state.config, state.backend.label, !finalHealth.ok)
         : "Memra (unset)";
       ctx.ui.setStatus(BADGE_KEY, badge);
 
