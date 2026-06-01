@@ -1,6 +1,18 @@
+import { readFileSync } from "node:fs";
 import type { MemraConfig, BackendMode } from "./config.ts";
 
 const DEFAULT_CLOUD_BASE_URL = "https://usememra.com/api";
+
+// Read the version from package.json so the User-Agent never drifts from the
+// published version. Best-effort — falls back to 0.0.0 if unreadable.
+const VERSION: string = (() => {
+  try {
+    return JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")).version ?? "0.0.0";
+  } catch {
+    return "0.0.0";
+  }
+})();
+const USER_AGENT = `memra-pi-extension/${VERSION}`;
 
 export class MemraError extends Error {
   constructor(
@@ -92,7 +104,7 @@ function cloudHeaders(apiKey: string): HeadersInit {
     Authorization: `Bearer ${apiKey}`,
     "Content-Type": "application/json",
     Accept: "application/json",
-    "User-Agent": "memra-pi-extension/0.2.1",
+    "User-Agent": USER_AGENT,
   };
 }
 
@@ -100,7 +112,7 @@ function localHeaders(): HeadersInit {
   return {
     "Content-Type": "application/json",
     Accept: "application/json",
-    "User-Agent": "memra-pi-extension/0.2.1",
+    "User-Agent": USER_AGENT,
   };
 }
 

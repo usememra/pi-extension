@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.6
+
+- Fix stale `User-Agent` header (was hardcoded `memra-pi-extension/0.2.1`). It now reads the version from `package.json` at load time, so it tracks the real version automatically and won't drift again
+
 ## 0.3.5
 
 - Migrate pi peer dependencies + imports from the deprecated `@mariozechner/*` scope to `@earendil-works/*` (`pi-ai`, `pi-coding-agent`) — the upstream packages were renamed
