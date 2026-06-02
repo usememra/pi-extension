@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.7
+
+- Require **memra-local >= 0.3.1** in the local-mode setup instructions. 0.3.1 caches the embedding model in `~/.cache/fastembed` (survives reboots — no ~90MB re-download that silently degraded recall to FTS-only), and ships the FTS5 query-escaping fix. No extension code changes; the REST API it consumes is unchanged
+- Fix the in-app `/memra status` hint, which still printed `memra-local serve` (no such binary) — corrected to `memra serve`. The README was fixed in 0.3.3 but the `src/commands.ts` string was missed
+
 ## 0.3.6
 
 - Fix stale `User-Agent` header (was hardcoded `memra-pi-extension/0.2.1`). It now reads the version from `package.json` at load time, so it tracks the real version automatically and won't drift again

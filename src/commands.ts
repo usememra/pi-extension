@@ -141,7 +141,7 @@ async function showStatus(ctx: CommandCtx, state: State): Promise<void> {
     const h = await backend.health();
     lines.push(`Health: ${h.ok ? "✓ OK" : `✗ DOWN — ${h.detail ?? "unknown"}`}`);
     if (!h.ok && cfg.mode === "local") {
-      lines.push("", "Start memra-local:", "  pipx install memra-local && memra-local serve", "Or switch to cloud: /memra switch");
+      lines.push("", "Start memra-local:", "  pipx install 'memra-local>=0.3.1' && memra serve", "Or switch to cloud: /memra switch");
     }
     if (!h.ok && cfg.mode === "cloud" && !cfg.cloud?.apiKey) {
       lines.push("", `No API key set — get one at ${INSTALL_URL}`, "Then run: /memra setkey");
