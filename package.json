@@ -1,13 +1,13 @@
 {
-  "name": "@usememra/pi-extension",
-  "version": "0.3.7",
+  "name": "@usememra/pi-memory",
+  "version": "4.5.0",
   "description": "Persistent memory for pi coding agent. Hybrid cloud + local backend (Memra).",
   "license": "MIT",
   "author": "Ali Vonsensey",
   "homepage": "https://usememra.com",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/usememra/pi-extension.git"
+    "url": "git+https://github.com/usememra/pi-memory.git"
   },
   "keywords": [
     "pi",
@@ -38,6 +38,12 @@
   ],
   "engines": {
     "node": ">=20"
+  },
+  "scripts": {
+    "test": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.0"
   },
   "peerDependencies": {
     "@earendil-works/pi-ai": "*",

@@ -1,5 +1,6 @@
 import { Type } from "typebox";
 import { StringEnum } from "@earendil-works/pi-ai";
+import { pickWriteMeta } from "./backend.ts";
 import type { Backend, RecallResult } from "./backend.ts";
 import type { MemraConfig } from "./config.ts";
 import {
@@ -34,7 +35,12 @@ function formatRecall(result: RecallResult): string {
     const imp = m.importance ? ` ⭐${m.importance}` : "";
     const tags = m.tags?.length ? ` #${m.tags.join(" #")}` : "";
     const type_ = m.type ? ` (${m.type})` : "";
-    return `${i + 1}. ${m.content}${type_}${score}${imp}${tags}`;
+    // v4.5 staleness metadata — only flag non-fresh memories, keep output lean.
+    const stale =
+      m.staleness_status && m.staleness_status !== "fresh"
+        ? ` ⚠${m.staleness_status}${m.last_confirmed ? ` (last confirmed ${m.last_confirmed})` : ""}`
+        : "";
+    return `${i + 1}. ${m.content}${type_}${score}${imp}${tags}${stale}`;
   });
 
   let out = lines.join("\n");
@@ -110,8 +116,19 @@ export function buildTools(
   }) => {
     try {
       const result = await getBackend().add({ content, type, importance, tags });
-      const id = (result as any)?.id ?? "unknown";
-      return ok(`✓ Memory stored (id: ${id})`, { id, result });
+      const id = (result as any)?.id ?? (result as any)?.data?.id ?? "unknown";
+      // v4.5 write metadata (cloud only) — surfaced when present, ignored otherwise.
+      const meta = pickWriteMeta(result);
+      const extras: string[] = [];
+      if (meta.revision !== undefined) extras.push(`rev ${meta.revision}`);
+      if (meta.embedding_status && meta.embedding_status !== "complete") {
+        extras.push(`embedding: ${meta.embedding_status}`);
+      }
+      let text = `✓ Memory stored (id: ${id}${extras.length ? `, ${extras.join(", ")}` : ""})`;
+      if (meta.conflicts?.length) {
+        text += `\n⚠ ${meta.conflicts.length} potential conflict(s) with existing memories — consider memra_supersede instead of duplicating.`;
+      }
+      return ok(text, { id, result });
     } catch (e) {
       return err(e);
     }

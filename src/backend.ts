@@ -12,7 +12,7 @@ const VERSION: string = (() => {
     return "0.0.0";
   }
 })();
-const USER_AGENT = `memra-pi-extension/${VERSION}`;
+const USER_AGENT = `memra-pi-memory/${VERSION}`;
 
 export class MemraError extends Error {
   constructor(
@@ -26,7 +26,6 @@ export class MemraError extends Error {
 
 export interface Backend {
   mode: BackendMode;
-  label: string;
   health(): Promise<{ ok: boolean; detail?: string }>;
   search(params: { query: string; limit?: number }): Promise<RecallResult>;
   add(params: {
@@ -53,6 +52,10 @@ export interface RecallResult {
     importance?: number;
     tags?: string[];
     created_at?: string;
+    // v4.5 staleness metadata (cloud only; absent on memra-local)
+    staleness_score?: number;
+    staleness_status?: string; // e.g. "fresh" | "aging" | "stale"
+    last_confirmed?: string;
   }>;
   meta?: {
     total_candidates?: number;
@@ -61,6 +64,28 @@ export interface RecallResult {
     degraded?: boolean;
   };
   estimated_tokens?: number;
+}
+
+/**
+ * v4.5 write-response fields (cloud only; all optional so local/older servers
+ * keep working). Responses may be flat or wrapped in `data` — pickWriteMeta
+ * handles both.
+ */
+export interface WriteMeta {
+  revision?: number;
+  embedding_status?: string;
+  conflicts?: Array<{ id?: string; content?: string; reason?: string } | string>;
+}
+
+export function pickWriteMeta(result: unknown): WriteMeta {
+  const root = (result ?? {}) as any;
+  const src = root?.data && typeof root.data === "object" ? root.data : root;
+  const meta: WriteMeta = {};
+  if (typeof src?.revision === "number") meta.revision = src.revision;
+  if (typeof src?.embedding_status === "string") meta.embedding_status = src.embedding_status;
+  const conflicts = src?.conflicts ?? root?.conflicts;
+  if (Array.isArray(conflicts) && conflicts.length > 0) meta.conflicts = conflicts;
+  return meta;
 }
 
 async function request<T = unknown>(
@@ -155,9 +180,10 @@ export function createCloudBackend(cfg: NonNullable<MemraConfig["cloud"]>): Back
     project_id: cfg.projectId,
   });
 
+  // No display strings here — the badge/label text is owned by ui.ts
+  // (formatLabel/renderBadge), built from the effective config.
   return {
     mode: "cloud",
-    label: `☁ cloud · ${cfg.projectId}`,
 
     async health() {
       try {
@@ -253,7 +279,6 @@ export function createLocalBackend(cfg: NonNullable<MemraConfig["local"]>): Back
 
   return {
     mode: "local",
-    label: `⌂ local · ${cfg.namespace}`,
 
     async health() {
       try {

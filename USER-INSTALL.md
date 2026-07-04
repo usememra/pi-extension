@@ -33,3 +33,10 @@ Then start pi and run:
 ```text
 /memra status
 ```
+
+## Where config is written
+
+- Global: `~/.memra/pi-extension.json` (mode `0600`) — mode, API key, tenant, default project/namespace.
+- Per-directory override (opt-in): `<workspace-root>/.memra/config.json` — pins this repo's project/namespace only. Created by `/memra namespace <name> --local` (or the "This project only" option), together with a `.memra/.gitignore` containing `config.json` so the pin stays machine-local. The workspace root is the nearest ancestor with `.git`; an override in `$HOME` itself is ignored.
+
+While an override is active the footer badge shows ` ‹.memra›` (e.g. `☁ memra cloud · my-project ‹.memra›`). The override wins over the global project/namespace; remove it via `/memra namespace` → "Remove project-local override", or `/memra reset`.

@@ -1,4 +1,4 @@
-import { loadConfig, saveConfig, type MemraConfig } from "./config.ts";
+import { loadConfig, saveConfig, loadLocalConfig, applyOverlay, type MemraConfig } from "./config.ts";
 import { createBackend, fetchProjectName, type Backend } from "./backend.ts";
 import { buildTools } from "./tools.ts";
 import { runCommand, initialConfigure, helpText, type State } from "./commands.ts";
@@ -26,10 +26,18 @@ export default function memraExtension(pi: ExtensionAPI) {
 function memraExtensionUnsafe(pi: ExtensionAPI) {
   const state: State = {
     config: undefined as unknown as MemraConfig,
+    effective: undefined as unknown as MemraConfig,
     backend: null,
+    localActive: false,
     rebuild: async () => {
       try {
-        state.backend = createBackend(state.config);
+        // `overridden` is applyOverlay's explicit flag — true whenever the
+        // override file contributed the active mode's key, even when its value
+        // equals the global one (an equal-value pin must still show ‹.memra›).
+        const { config: effective, overridden } = applyOverlay(state.config, await loadLocalConfig());
+        state.effective = effective;
+        state.localActive = overridden;
+        state.backend = createBackend(effective);
       } catch (e) {
         state.backend = null;
         console.error("[memra] backend init failed:", (e as Error).message);
@@ -46,7 +54,7 @@ function memraExtensionUnsafe(pi: ExtensionAPI) {
 
   // ── Register tools ──────────────────────────────────────────────
   // Tools are always visible to the LLM; they fail gracefully if unconfigured.
-  const tools = buildTools(getBackendOrThrow, () => state.config);
+  const tools = buildTools(getBackendOrThrow, () => state.effective ?? state.config);
   for (const t of tools) {
     pi.registerTool({
       name: t.name,
@@ -108,7 +116,7 @@ function memraExtensionUnsafe(pi: ExtensionAPI) {
       // Update badge
       const finalHealth = state.backend ? await state.backend.health() : { ok: false };
       const badge = state.backend
-        ? renderBadge(state.config, state.backend.label, !finalHealth.ok)
+        ? renderBadge(state.effective ?? state.config, state.localActive, !finalHealth.ok)
         : "Memra (unset)";
       ctx.ui.setStatus(BADGE_KEY, badge);
 
